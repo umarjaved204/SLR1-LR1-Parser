@@ -1,0 +1,116 @@
+Input case 1: other
+SLR parse tree:
+Stmt
+  other
+
+LR(1) parse tree:
+Stmt
+  other
+
+
+Input case 2: if id then other
+SLR parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    other
+
+LR(1) parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    other
+
+
+Input case 3: if id then other else other
+SLR parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    other
+
+LR(1) parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    other
+  else
+  Stmt
+    other
+
+
+Input case 4: if id then if id then other else other
+SLR parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    if
+    Expr
+      id
+    then
+    Stmt
+      other
+
+LR(1) parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    if
+    Expr
+      id
+    then
+    Stmt
+      other
+    else
+    Stmt
+      other
+
+
+Input case 5: if id then if id then other
+SLR parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    if
+    Expr
+      id
+    then
+    Stmt
+      other
+
+LR(1) parse tree:
+Stmt
+  if
+  Expr
+    id
+  then
+  Stmt
+    if
+    Expr
+      id
+    then
+    Stmt
+      other
+
+

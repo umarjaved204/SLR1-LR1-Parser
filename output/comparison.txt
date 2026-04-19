@@ -1,0 +1,40 @@
+Grammar file: input\grammar4.txt
+Original start symbol: Stmt
+Augmented start symbol: StmtPrime
+SLR states: 10
+LR(1) states: 17
+SLR table entries: 20
+LR(1) table entries: 33
+SLR build time (ms): 32.9642
+LR(1) build time (ms): 9.4411
+
+Input case 1: other
+  SLR accepted: true
+  LR(1) accepted: true
+  SLR parse time (ms): 24.0609
+  LR(1) parse time (ms): 4.4284
+
+Input case 2: if id then other
+  SLR accepted: true
+  LR(1) accepted: true
+  SLR parse time (ms): 1.1101
+  LR(1) parse time (ms): 0.8202
+
+Input case 3: if id then other else other
+  SLR accepted: false
+  LR(1) accepted: true
+  SLR parse time (ms): 0.8647
+  LR(1) parse time (ms): 0.6842
+
+Input case 4: if id then if id then other else other
+  SLR accepted: false
+  LR(1) accepted: true
+  SLR parse time (ms): 0.6913
+  LR(1) parse time (ms): 1.1903
+
+Input case 5: if id then if id then other
+  SLR accepted: true
+  LR(1) accepted: true
+  SLR parse time (ms): 0.901
+  LR(1) parse time (ms): 0.8087
+

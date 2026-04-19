@@ -1,0 +1,44 @@
+I0:
+  1. StmtPrime -> • Stmt
+  2. Stmt -> • if Expr then Stmt
+  3. Stmt -> • if Expr then Stmt else Stmt
+  4. Stmt -> • other
+  Transitions: {Stmt=1, if=2, other=3}
+I1:
+  1. StmtPrime -> Stmt •
+  Transitions: {}
+I2:
+  1. Stmt -> if • Expr then Stmt
+  2. Stmt -> if • Expr then Stmt else Stmt
+  3. Expr -> • id
+  Transitions: {Expr=4, id=5}
+I3:
+  1. Stmt -> other •
+  Transitions: {}
+I4:
+  1. Stmt -> if Expr • then Stmt
+  2. Stmt -> if Expr • then Stmt else Stmt
+  Transitions: {then=6}
+I5:
+  1. Expr -> id •
+  Transitions: {}
+I6:
+  1. Stmt -> if Expr then • Stmt
+  2. Stmt -> if Expr then • Stmt else Stmt
+  3. Stmt -> • if Expr then Stmt
+  4. Stmt -> • if Expr then Stmt else Stmt
+  5. Stmt -> • other
+  Transitions: {Stmt=7, if=2, other=3}
+I7:
+  1. Stmt -> if Expr then Stmt •
+  2. Stmt -> if Expr then Stmt • else Stmt
+  Transitions: {else=8}
+I8:
+  1. Stmt -> if Expr then Stmt else • Stmt
+  2. Stmt -> • if Expr then Stmt
+  3. Stmt -> • if Expr then Stmt else Stmt
+  4. Stmt -> • other
+  Transitions: {Stmt=9, if=2, other=3}
+I9:
+  1. Stmt -> if Expr then Stmt else Stmt •
+  Transitions: {}

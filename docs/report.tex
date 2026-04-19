@@ -1,0 +1,316 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdftitle={CS4031 Assignment 03 Report},
+    pdfauthor={Umar Javed and Sheharyar Ahmed}
+}
+
+\lstdefinestyle{reportstyle}{
+    basicstyle=\ttfamily\small,
+    columns=fullflexible,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{CS4031 Assignment 03}
+\rhead{Bottom-Up Parser Design}
+\cfoot{\thepage}
+
+\title{\textbf{CS4031 Assignment 03}\\Bottom-Up Parser Design \& Implementation\\SLR(1) and LR(1) Parsing}
+\author{Umar Javed (22i-1050) \and Sheharyar Ahmed (22i-1171)}
+\date{Spring 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\vspace{0.5cm}
+
+\noindent\textbf{Course:} Compiler Construction\\
+\textbf{Language Used:} Java
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+Bottom-up parsing constructs a parse tree by repeatedly reducing input symbols to higher-level grammar symbols until the start symbol is reached. Unlike top-down parsing, which predicts productions from the start symbol downward, bottom-up parsing works from the input string upward and is the basis of LR-family parsers.
+
+This assignment implements two bottom-up parser variants:
+\begin{itemize}[leftmargin=1.5em]
+    \item SLR(1), which uses LR(0) item sets and FOLLOW sets for reduce actions.
+    \item LR(1), which uses LR(1) items with explicit lookahead symbols for more precise reductions.
+\end{itemize}
+
+The implementation reads a context-free grammar from a text file, augments it with a new start symbol, constructs canonical item collections, builds parsing tables, parses test inputs using shift-reduce parsing, detects conflicts, and generates parse trees for accepted strings.
+
+\section{Approach}
+
+\subsection{Data Structures}
+
+The parser is organized into reusable Java classes:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{Grammar} stores productions, terminal and non-terminal sets, FIRST sets, FOLLOW sets, and grammar augmentation logic.
+    \item \texttt{Items} defines LR(0) and LR(1) item representations and builds canonical automata.
+    \item \texttt{ParsingTable} stores ACTION and GOTO entries and records conflicts.
+    \item \texttt{Stack} implements the parser stack used during shift-reduce parsing.
+    \item \texttt{Tree} and \texttt{TreeNode} represent parse trees.
+    \item \texttt{SLRParser} and \texttt{LR1Parser} build parser tables and execute parsing.
+    \item \texttt{Main} coordinates file input, parser execution, and output generation.
+\end{itemize}
+
+\subsection{Grammar Handling}
+
+The grammar file uses one production per line in the form:
+
+\begin{lstlisting}[style=reportstyle]
+NonTerminal -> production1 | production2 | production3
+\end{lstlisting}
+
+The parser supports multi-character non-terminals, terminals written as tokens, and epsilon productions using either \texttt{epsilon} or \texttt{@}. The grammar is augmented by adding a new start symbol of the form \texttt{StartPrime -> Start}.
+
+\subsection{LR(0) Item Construction}
+
+For SLR(1), canonical LR(0) item sets are built using the standard closure and goto operations:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{closure(I)} adds items for non-terminals appearing immediately after the dot.
+    \item \texttt{goto(I, X)} moves the dot over grammar symbol \texttt{X} and then applies closure.
+\end{itemize}
+
+The canonical collection is built by repeatedly applying goto to each state and each grammar symbol until no new item sets are discovered.
+
+\subsection{LR(1) Item Construction}
+
+LR(1) items extend LR(0) items by adding a lookahead terminal. The closure operation propagates lookahead information using FIRST sets of the suffix after the non-terminal plus the current lookahead. This makes LR(1) reductions more precise than SLR(1).
+
+\subsection{Parsing Table Construction}
+
+\subsubsection{SLR(1)}
+\begin{itemize}[leftmargin=1.5em]
+    \item Shift actions are added when an item has a terminal immediately after the dot.
+    \item Reduce actions are added for completed items using FOLLOW(lhs).
+    \item Accept is added when the augmented start item completes on \texttt{\$}.
+    \item GOTO entries are added for non-terminals.
+\end{itemize}
+
+\subsubsection{LR(1)}
+\begin{itemize}[leftmargin=1.5em]
+    \item Shift actions are added the same way as SLR(1).
+    \item Reduce actions are added only for the specific lookahead in the LR(1) item.
+    \item Accept is added for \texttt{[StartPrime -> Start \textbullet, $]}.
+    \item GOTO entries are added the same way as SLR(1).
+\end{itemize}
+
+\subsection{Parse Tree Generation}
+
+Each reduction creates a parse tree node whose children are the symbols reduced from the stack. When parsing succeeds, the final tree root is the original start symbol. The tree is written in a readable indented form.
+
+\subsection{Design Decisions and Trade-Offs}
+
+The project uses a modular structure so that grammar handling, item-set construction, table construction, and parsing are separated. This makes the SLR(1) and LR(1) implementations share the same grammar and stack infrastructure while differing only in item-set logic and reduce lookahead rules.
+
+A deliberate trade-off was to keep the parser token-based and avoid lexical analysis. This keeps the implementation focused on parser construction, which matches the assignment requirements.
+
+\section{Challenges}
+
+\begin{enumerate}[leftmargin=1.5em]
+    \item Correctly handling epsilon in FIRST computations and LR(1) closure propagation.
+    \item Ensuring grammar augmentation happens before item-set construction.
+    \item Detecting shift/reduce and reduce/reduce conflicts without overwriting earlier table decisions silently.
+    \item Generating parse trees that reflect the actual reduction sequence.
+    \item Keeping the implementation generic enough to work across multiple grammars while still remaining simple to test.
+\end{enumerate}
+
+The most important fix was handling LR(1) lookahead propagation carefully so that reductions occur only when the item's specific lookahead matches the current input symbol.
+
+\section{Test Cases}
+
+The following grammars were added under \texttt{input/}.
+
+\subsection{Simple Expression Grammar}
+\texttt{grammar1.txt}
+\begin{lstlisting}[style=reportstyle]
+Expr -> Expr + Term | Term
+Term -> Factor
+Factor -> id
+\end{lstlisting}
+
+\subsection{Expression Grammar With Precedence}
+\texttt{grammar2.txt}
+\begin{lstlisting}[style=reportstyle]
+Expr -> Expr + Term | Term
+Term -> Term * Factor | Factor
+Factor -> ( Expr ) | id
+\end{lstlisting}
+
+\subsection{Classic SLR(1) Conflict Grammar}
+\texttt{grammar3.txt}
+\begin{lstlisting}[style=reportstyle]
+Start -> L = R | R
+L -> * R | id
+R -> L
+\end{lstlisting}
+
+This grammar is a standard example where SLR(1) has a conflict while LR(1) resolves it.
+
+\subsection{Dangling Else Grammar}
+\texttt{grammar4.txt}
+\begin{lstlisting}[style=reportstyle]
+Stmt -> if Expr then Stmt | if Expr then Stmt else Stmt | other
+Expr -> id
+\end{lstlisting}
+
+\subsection{Input Sets}
+The following test input files are included:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{grammar1_inputs.txt}
+    \item \texttt{grammar2_inputs.txt}
+    \item \texttt{grammar3_inputs.txt}
+    \item \texttt{grammar4_inputs.txt}
+    \item \texttt{input_valid.txt}
+    \item \texttt{input_invalid.txt}
+\end{itemize}
+
+These include valid strings, invalid strings, empty input handling, nested structures, and conflict-triggering strings.
+
+\subsection{Sample Inputs Used}
+Examples include:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{id + id * id}
+    \item \texttt{( id + id ) * id}
+    \item \texttt{id = id}
+    \item \texttt{if id then other else other}
+    \item invalid strings such as \texttt{id + + id} and \texttt{( id + id}
+\end{itemize}
+
+\section{Comparison Analysis}
+
+\subsection{SLR(1) vs LR(1) Parsing Power}
+SLR(1) uses FOLLOW sets, so its reduce actions are less precise. LR(1) uses item-specific lookaheads and can resolve conflicts that SLR(1) cannot.
+
+The grammar in \texttt{grammar3.txt} demonstrates this difference. In the generated table output, SLR reports a conflict while LR(1) does not.
+
+\subsection{State Count and Table Size}
+A sample run on \texttt{grammar2.txt} produced:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Metric} & \textbf{SLR(1)} & \textbf{LR(1)} \\
+\midrule
+Number of states & 12 & 22 \\
+Table entries & 45 & 71 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This shows the usual trade-off: LR(1) is more powerful but often larger.
+
+\subsection{Construction Time}
+A sample run on \texttt{grammar2.txt} showed that both parsers complete table construction quickly on assignment-sized grammars. The exact values vary by grammar and machine, but the build times remain practical for classroom-scale inputs.
+
+\subsection{Parsing Speed}
+Parsing speed is also fast for the provided sample inputs. The comparison output written by the program records parse time for each test string in both parsers.
+
+\subsection{Conflict Behavior}
+For \texttt{grammar3.txt}:
+\begin{itemize}[leftmargin=1.5em]
+    \item SLR(1) reports a shift/reduce conflict.
+    \item LR(1) resolves the conflict and produces a conflict-free table.
+\end{itemize}
+
+For \texttt{grammar4.txt}, the implementation also exposes the kind of ambiguity that must be reported during table construction.
+
+\section{Sample Outputs}
+
+The program writes all major artifacts into \texttt{output/}:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{augmented\_grammar.txt}
+    \item \texttt{slr_items.txt}
+    \item \texttt{slr_parsing_table.txt}
+    \item \texttt{slr_trace.txt}
+    \item \texttt{lr1_items.txt}
+    \item \texttt{lr1_parsing_table.txt}
+    \item \texttt{lr1_trace.txt}
+    \item \texttt{comparison.txt}
+    \item \texttt{parse_trees.txt}
+\end{itemize}
+
+\subsection{SLR Trace Example}
+A successful run for the expression grammar shows a shift-reduce sequence ending in accept.
+
+\subsection{LR(1) Conflict Resolution Example}
+For the classic conflict grammar, the SLR table includes a conflict, while the LR(1) table is conflict-free.
+
+\subsection{Parse Tree Example}
+For \texttt{id + id * id}, the parse tree is generated from the reduction sequence and shows the correct hierarchy of expression, term, factor, and terminal nodes.
+
+\subsection{Screenshots}
+Insert screenshots here from the generated output files or terminal execution:
+\begin{itemize}[leftmargin=1.5em]
+    \item canonical item sets
+    \item parsing tables
+    \item parsing traces
+    \item parse trees
+    \item conflict messages
+\end{itemize}
+
+\section{Conclusion}
+
+This assignment demonstrates how bottom-up parsing works in practice and highlights the difference between SLR(1) and LR(1) parsing power. The SLR(1) parser is simpler and smaller, but it depends on FOLLOW sets and can produce conflicts for grammars that LR(1) handles correctly. LR(1) is more precise because it carries lookahead information directly in items.
+
+The implementation is modular, reusable, and organized for testing across multiple grammars. It also generates parse trees and trace outputs, which makes the parser behavior easy to inspect and verify.
+
+\section*{Appendix: Folder Structure}
+\addcontentsline{toc}{section}{Appendix: Folder Structure}
+
+\begin{lstlisting}[style=reportstyle]
+Assignment 03/
+├── src/
+│   ├── Main.java
+│   ├── Grammar.java
+│   ├── SLRParser.java
+│   ├── LR1Parser.java
+│   ├── Items.java
+│   ├── ParsingTable.java
+│   ├── Stack.java
+│   └── Tree.java
+├── input/
+│   ├── grammar1.txt
+│   ├── grammar1_inputs.txt
+│   ├── grammar2.txt
+│   ├── grammar2_inputs.txt
+│   ├── grammar3.txt
+│   ├── grammar3_inputs.txt
+│   ├── grammar4.txt
+│   ├── grammar4_inputs.txt
+│   ├── grammar_with_conflict.txt
+│   ├── input_valid.txt
+│   └── input_invalid.txt
+├── output/
+├── docs/
+│   └── report.tex
+├── build.bat
+└── README.md
+\end{lstlisting}
+
+\end{document}

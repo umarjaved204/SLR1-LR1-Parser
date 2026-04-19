@@ -1,0 +1,96 @@
+I0:
+  1. [StmtPrime -> • Stmt, $]
+  2. [Stmt -> • if Expr then Stmt, $]
+  3. [Stmt -> • if Expr then Stmt else Stmt, $]
+  4. [Stmt -> • other, $]
+  Transitions: {Stmt=1, if=2, other=3}
+I1:
+  1. [StmtPrime -> Stmt •, $]
+  Transitions: {}
+I2:
+  1. [Stmt -> if • Expr then Stmt, $]
+  2. [Stmt -> if • Expr then Stmt else Stmt, $]
+  3. [Expr -> • id, then]
+  Transitions: {Expr=4, id=5}
+I3:
+  1. [Stmt -> other •, $]
+  Transitions: {}
+I4:
+  1. [Stmt -> if Expr • then Stmt, $]
+  2. [Stmt -> if Expr • then Stmt else Stmt, $]
+  Transitions: {then=6}
+I5:
+  1. [Expr -> id •, then]
+  Transitions: {}
+I6:
+  1. [Stmt -> if Expr then • Stmt, $]
+  2. [Stmt -> if Expr then • Stmt else Stmt, $]
+  3. [Stmt -> • if Expr then Stmt, $]
+  4. [Stmt -> • if Expr then Stmt else Stmt, $]
+  5. [Stmt -> • other, $]
+  6. [Stmt -> • if Expr then Stmt, else]
+  7. [Stmt -> • if Expr then Stmt else Stmt, else]
+  8. [Stmt -> • other, else]
+  Transitions: {Stmt=7, if=8, other=9}
+I7:
+  1. [Stmt -> if Expr then Stmt •, $]
+  2. [Stmt -> if Expr then Stmt • else Stmt, $]
+  Transitions: {else=10}
+I8:
+  1. [Stmt -> if • Expr then Stmt, $]
+  2. [Stmt -> if • Expr then Stmt else Stmt, $]
+  3. [Stmt -> if • Expr then Stmt, else]
+  4. [Stmt -> if • Expr then Stmt else Stmt, else]
+  5. [Expr -> • id, then]
+  Transitions: {Expr=11, id=5}
+I9:
+  1. [Stmt -> other •, $]
+  2. [Stmt -> other •, else]
+  Transitions: {}
+I10:
+  1. [Stmt -> if Expr then Stmt else • Stmt, $]
+  2. [Stmt -> • if Expr then Stmt, $]
+  3. [Stmt -> • if Expr then Stmt else Stmt, $]
+  4. [Stmt -> • other, $]
+  Transitions: {Stmt=12, if=2, other=3}
+I11:
+  1. [Stmt -> if Expr • then Stmt, $]
+  2. [Stmt -> if Expr • then Stmt else Stmt, $]
+  3. [Stmt -> if Expr • then Stmt, else]
+  4. [Stmt -> if Expr • then Stmt else Stmt, else]
+  Transitions: {then=13}
+I12:
+  1. [Stmt -> if Expr then Stmt else Stmt •, $]
+  Transitions: {}
+I13:
+  1. [Stmt -> if Expr then • Stmt, $]
+  2. [Stmt -> if Expr then • Stmt else Stmt, $]
+  3. [Stmt -> if Expr then • Stmt, else]
+  4. [Stmt -> if Expr then • Stmt else Stmt, else]
+  5. [Stmt -> • if Expr then Stmt, $]
+  6. [Stmt -> • if Expr then Stmt else Stmt, $]
+  7. [Stmt -> • other, $]
+  8. [Stmt -> • if Expr then Stmt, else]
+  9. [Stmt -> • if Expr then Stmt else Stmt, else]
+  10. [Stmt -> • other, else]
+  Transitions: {Stmt=14, if=8, other=9}
+I14:
+  1. [Stmt -> if Expr then Stmt •, $]
+  2. [Stmt -> if Expr then Stmt • else Stmt, $]
+  3. [Stmt -> if Expr then Stmt •, else]
+  4. [Stmt -> if Expr then Stmt • else Stmt, else]
+  Transitions: {else=15}
+I15:
+  1. [Stmt -> if Expr then Stmt else • Stmt, $]
+  2. [Stmt -> if Expr then Stmt else • Stmt, else]
+  3. [Stmt -> • if Expr then Stmt, $]
+  4. [Stmt -> • if Expr then Stmt else Stmt, $]
+  5. [Stmt -> • other, $]
+  6. [Stmt -> • if Expr then Stmt, else]
+  7. [Stmt -> • if Expr then Stmt else Stmt, else]
+  8. [Stmt -> • other, else]
+  Transitions: {Stmt=16, if=8, other=9}
+I16:
+  1. [Stmt -> if Expr then Stmt else Stmt •, $]
+  2. [Stmt -> if Expr then Stmt else Stmt •, else]
+  Transitions: {}

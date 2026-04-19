@@ -1,0 +1,20 @@
+State if                then              else              other             id                $                 Stmt              Expr              
+I0    s2                                                    s3                                                    1                                   
+I1                                                                                              acc                                                   
+I2                                                                            s5                                                    4                 
+I3                                                                                              r(Stmt -> other)                                      
+I4                      s6                                                                                                                            
+I5                      r(Expr -> id)                                                                                                                 
+I6    s8                                                    s9                                                    7                                   
+I7                                        s10                                                   r(Stmt -> if Expr then Stmt)                                    
+I8                                                                            s5                                                    11                
+I9                                        r(Stmt -> other)                                      r(Stmt -> other)                                      
+I10   s2                                                    s3                                                    12                                  
+I11                     s13                                                                                                                           
+I12                                                                                             r(Stmt -> if Expr then Stmt else Stmt)                                    
+I13   s8                                                    s9                                                    14                                  
+I14                                       s15                                                   r(Stmt -> if Expr then Stmt)                                    
+I15   s8                                                    s9                                                    16                                  
+I16                                       r(Stmt -> if Expr then Stmt else Stmt)                                    r(Stmt -> if Expr then Stmt else Stmt)                                    
+
+Conflict at ACTION[14, else]: s15 vs r(Stmt -> if Expr then Stmt)
